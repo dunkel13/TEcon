@@ -1,6 +1,4 @@
 #################### Tópico de econometría: Microeconometría ###################### 
-#################### Karoll Gómez Portilla ###################### 
-#################### Universidad Nacional de Colombia ###################### 
 #################### Lab 1.3: Regression Methods: MM y GMM ###################### 
 
 ######################## Example 1: Estimating the parameters of a normal distribution 
