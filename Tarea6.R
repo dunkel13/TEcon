@@ -60,3 +60,26 @@ iteracion2=as.vector(res2a1$par)
 res2a2 = optim(par=iteracion2, SS_min, y=Score, X=X)
 res2a2$par
 coef(lm(Score ~ lunch + calworks + STR)->lm0)
+################## maxima verosimilitud
+dat3=data.frame(x1=lunch, x2=calworks, x3=STR, y=Score)
+llik3 = function(data, par){ 
+  b0e=par[1]
+  b1e=par[2]
+  b2e=par[3]
+  b3e=par[4]
+  s=par[3]
+  Res= data$y-(b0e+data$x1*b1e+data$x2*b2e+data$x3*b3e)
+  n=length(Res) 
+  ll = -(n/ 2)*(log(2*pi*s^2)) + (-1/(2*s^2)) * sum(Res^2)# instead of (x-m)^2 given that E(res)=0
+  return(-ll) 
+} 
+res3a = optim(par=c(0.5,0.5,0.5,0.5,0.5), llik3, data=dat3) 
+iteracion1a=as.vector(res3a$par)
+res3a1 = optim(par=iteracion1a, llik3, data=dat3) 
+iteracion1b=as.vector(res3a1$par)
+res3a2 = optim(par=iteracion1b, llik3, data=dat3) 
+iteracion1c=as.vector(res3a2$par)
+res3af = optim(par=iteracion1c, llik3, data=dat3) 
+res3af$par
+coef(lm(Score ~ lunch + calworks + STR)->lm0)
+summary(lm0)
