@@ -67,19 +67,20 @@ llik3 = function(data, par){
   b1e=par[2]
   b2e=par[3]
   b3e=par[4]
-  s=par[3]
+  s=par[5]
   Res= data$y-(b0e+data$x1*b1e+data$x2*b2e+data$x3*b3e)
   n=length(Res) 
   ll = -(n/ 2)*(log(2*pi*s^2)) + (-1/(2*s^2)) * sum(Res^2)# instead of (x-m)^2 given that E(res)=0
   return(-ll) 
 } 
-res3a = optim(par=c(0.5,0.5,0.5,0.5,0.5), llik3, data=dat3) 
-iteracion1a=as.vector(res3a$par)
-res3a1 = optim(par=iteracion1a, llik3, data=dat3) 
-iteracion1b=as.vector(res3a1$par)
-res3a2 = optim(par=iteracion1b, llik3, data=dat3) 
-iteracion1c=as.vector(res3a2$par)
-res3af = optim(par=iteracion1c, llik3, data=dat3) 
-res3af$par
-coef(lm(Score ~ lunch + calworks + STR)->lm0)
-summary(lm0)
+
+tol2=c(1,1,1,1,1)
+iteracion2=c(0.5,0.5,0.5,0.5,0.5)
+sigma<-sqrt(sum(lm0$residuals^2)/(420-4))
+coef_est2=c(coef_est, sigma); coef_est2
+while(tol2[1]>0.001 & tol2[2]>0.001 & tol2[3]>0.001 & tol2[4]>0.001 & tol2[5]>0.001 ){
+  res3= optim(par=iteracion2, llik3, data=dat3)
+  iteracion2=res3$par
+  tol2=abs(iteracion2-coef_est2)
+}
+res3$par
