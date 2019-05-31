@@ -53,13 +53,17 @@ SS_min = function (y,X, par){
   return(loss)
 }
 det(t(X)%*%X)
-res2a = optim(par=c(0.5,  0.5,  0.5,  0.5), SS_min, y=Score, X=X)
-iteracion1=as.vector(res2a$par)
-res2a1 = optim(par=iteracion1, SS_min, y=Score, X=X)
-iteracion2=as.vector(res2a1$par)
-res2a2 = optim(par=iteracion2, SS_min, y=Score, X=X)
-res2a2$par
-coef(lm(Score ~ lunch + calworks + STR)->lm0)
+
+tol=c(1,1,1,1)
+iteracion=c(0.5,0.5,0.5,0.5)
+coef_est=as.vector(coef(lm(Score ~ lunch + calworks + STR)->lm0));coef_est
+while(tol[1]>0.001 & tol[2]>0.001 & tol[3]>0.001 & tol[4]>0.001 ){
+  res2 = optim(par=iteracion, SS_min, y=Score, X=X)
+  iteracion=res2$par
+  tol=abs(iteracion-coef_est)
+}
+res2$par
+
 ################## maxima verosimilitud
 dat3=data.frame(x1=lunch, x2=calworks, x3=STR, y=Score)
 llik3 = function(data, par){ 
@@ -84,3 +88,20 @@ while(tol2[1]>0.001 & tol2[2]>0.001 & tol2[3]>0.001 & tol2[4]>0.001 & tol2[5]>0.
   tol2=abs(iteracion2-coef_est2)
 }
 res3$par
+
+#### Método de los momentos
+det(t(X)%*%X)
+mean(t(X)%*%(Score - X%*%coef_est))
+install.packages("gmm")
+library(gmm) 
+ols.moments = function(param,data=NULL) {  
+  data = as.matrix(data)  
+  y=data[,4]  
+  x=cbind(1,data[,c(1:3)]) # add the intercept and remove y (1st data col)  
+  x*as.vector(y - x%*%param) 
+} 
+start.vals=c(0,0,0,1)
+gmm.model=gmm(ols.moments,dat3,t0=start.vals,vcov="HAC")
+summary(gmm.model)
+gmm.model$coefficients
+coef_est
