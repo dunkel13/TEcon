@@ -39,6 +39,7 @@ res1$par
 ###########################
 install.packages("AER")
 library(AER)
+data(CASchools)
 attach(CASchools)
 names(CASchools)
 Score<-(read+math)/2
