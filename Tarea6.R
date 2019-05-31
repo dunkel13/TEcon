@@ -35,3 +35,27 @@ llik2 = function(data, par){
 } 
 res1 = optim(par=c(0.5,0.5,0.5), llik2, data=dat2) 
 res1$par
+
+###########################
+install.packages("AER")
+library(AER)
+attach(CASchools)
+names(CASchools)
+Score<-(read+math)/2
+STR<- students/teachers
+
+X<-matrix(c(rep(1,420), lunch, calworks, STR), nr=420, nc=4)
+
+SS_min = function (y,X, par){
+  beta=c(par[1],par[2],par[3],par[4])
+  loss= t(y-X%*%beta)%*%(y-X%*%beta)
+  return(loss)
+}
+det(t(X)%*%X)
+res2a = optim(par=c(0.5,  0.5,  0.5,  0.5), SS_min, y=Score, X=X)
+iteracion1=as.vector(res2a$par)
+res2a1 = optim(par=iteracion1, SS_min, y=Score, X=X)
+iteracion2=as.vector(res2a1$par)
+res2a2 = optim(par=iteracion2, SS_min, y=Score, X=X)
+res2a2$par
+coef(lm(Score ~ lunch + calworks + STR)->lm0)
