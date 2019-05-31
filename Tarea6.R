@@ -103,5 +103,10 @@ ols.moments = function(param,data=NULL) {
 start.vals=c(0,0,0,1)
 gmm.model=gmm(ols.moments,dat3,t0=start.vals,vcov="HAC")
 summary(gmm.model)
+gmm.model=gmm(ols.moments,dat3,t0=start.vals,vcov="HAC")
+iteracion3=as.vector(gmm.model$coefficients)
+gmm.model=gmm(ols.moments,dat3,t0=iteracion3,vcov="HAC")
+iteracion3=as.vector(gmm.model$coefficients)
+gmm.model=gmm(ols.moments,dat3,t0=iteracion3,vcov="HAC")
 gmm.model$coefficients
 coef_est
