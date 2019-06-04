@@ -137,3 +137,24 @@ scalefactor1 =lambda*(1-lambda)
 scalefactor1
 margin1 = scalefactor*beta[2:4]
 margin1
+
+# The Zelig library is more flexible allowing us to do the same things as are done
+
+install.packages("Zelig")
+library(Zelig)
+probit.out = zelig(GRADE ~ GPA + TUCE + PSI, model = "probit", data = Spector)
+summary(probit.out)
+
+# Execute the following to get the auxiliary outputs from probit.out and the summary object.
+# Now for interpretation of the model.
+
+#Simulate the predicted probability of making an A, PSI=0, rest at mean
+x.out = setx(probit.out, PSI = 0)
+s.out = sim(probit.out, x = x.out)
+summary(s.out)
+
+#Simulate the predicted probability of making an A, PSI=1, rest at mean
+x.out = setx(probit.out, PSI = 1)
+s.out = sim(probit.out, x = x.out)
+summary(s.out)
+
