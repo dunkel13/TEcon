@@ -295,3 +295,68 @@ z
 pz = 1/(1+exp(-c(z)))
 pz
 
+######################## Example 4: Now let's estimate a heteroskedastic probit model and test for heteroskedasticity using a likelihood ratio test. Suppose the heteroskedasticity is a function of PSI
+
+x = cbind(1,GPA,TUCE,PSI)
+y = as.matrix(GRADE)
+z = as.matrix(PSI)
+K = ncol(x)
+K
+k= ncol(z)
+k
+n = nrow(x)
+n
+K1= K+1
+K1
+Kk = K+k
+Kk
+
+#Define Heteroskedastic Probit LogLikelihood
+
+llik.hprobit = function(par, X, Y, Z){
+    Y = as.matrix(y)
+    X = as.matrix(x)
+    Z = as.matrix(z)
+    b = as.matrix(par[1:K])
+    g = as.matrix(par[K1:Kk])
+    phi = pnorm((X %*% b)/exp(Z %*% g), mean=0, sd=1, lower.tail =TRUE, log.p = FALSE)
+    sum(Y*log(phi)+(1-Y)*log(1-phi))
+}
+
+#Fit Heteroskedastic Probit Model
+values.start = c(coefficients(probit.out),1)
+values.start
+mod.hprobit = optim(values.start, llik.hprobit, method="BFGS", control=list(maxit=2000, fnscale=-1), hessian=T)
+mod.hprobit
+
+# Save the log likelihood for later use
+LU = mod.hprobit$value
+LU
+
+# Calculate the variance matrix from the Hessian matrix.
+v = -solve(mod.hprobit$hessian)
+v
+# Calculate the standard errors from the variance matrix.
+se = sqrt(*diag(v))
+se
+# Calculate the z statistics from the coefficients and standard errors
+b = mod.hprobit$par
+b
+zstat = b/se
+zstat
+# Calculate p values from the z statistics
+pz = 2*(1-pnorm(abs(zstat)))
+pz
+# Obtain the underlying latent index, zh.
+zh = x%*% b[1:4]
+zh
+# Calculate the probabilities for each value of zh
+pz = pnorm(c(zh))
+pz
+
+# Do a likelihood ratio test for the heteroskedastic model (LU) vs. the homoskedastic model (LR) H0: Restricted model is better
+j = Kk - K1+1
+lrtest = -2*(LR-LU)
+lrtest
+lrpvalue = 1-pchisq(lrtest, df=j)
+lrpvalue
