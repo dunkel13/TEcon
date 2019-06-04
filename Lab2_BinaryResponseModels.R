@@ -244,3 +244,54 @@ z
 
 # Calculate the probabilities for each value of z
 pz = pnorm(c(z))
+
+######################## Example 3: let's estimate a Logit the hard way and obtain the interesting quantities.
+
+# Define Logit Log Likelihood
+llik.logit=function(par, X, Y){
+    Y = as.matrix(y)
+    X = as.matrix(x)
+    b = as.matrix(par[1:K])
+    Lambda = 1/(1+exp(-X%*%b))
+    sum(Y*log(Lambda)+(1-Y)*log(1-Lambda))
+}
+
+
+values.start = lm( GRADE ~ GPA + TUCE + PSI)$coef
+mod.logit = optim(values.start, llik.logit, Y=Y, X=X, method="BFGS", control=list(maxit=2000, fnscale=-1), hessian=T)
+mod.logit
+
+# Save the log likelihood for later use
+LR = mod.logit$value
+LR
+
+# Calculate the variance matrix from the Hessian matrix.
+v = -solve(mod.logit$hessian)
+v
+
+# Calculate the standard errors from the variance matrix.
+se  = sqrt(diag(v))
+se
+
+# Calculate the z statistics from the coefficients and standard errors
+b = mod.logit$par
+b
+zstat = b/se
+zstat
+
+# Calculate p values from the z statistics
+pz = 2*(1-pnorm(abs(zstat)))
+pz
+
+# Put the results together in a table.
+table = cbind(b,se,zstat,pz)
+table
+
+# Obtain the underlying logit latent index, z.
+z = x%*% b
+z
+
+# Calculate the logit probabilities for each value of z
+pz = 1/(1+exp(-c(z)))
+pz
+
