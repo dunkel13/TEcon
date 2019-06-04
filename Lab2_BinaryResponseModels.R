@@ -158,3 +158,20 @@ x.out = setx(probit.out, PSI = 1)
 s.out = sim(probit.out, x = x.out)
 summary(s.out)
 
+# We could just take the difference between these to get a first difference. However, Zelig can do this in one step.
+# Simulated first difference and risk ratios when Shifting PSI from 0 to 1 #
+psi.low = setx(probit.out, PSI = 0)
+psi.high = setx(probit.out, PSI = 1)
+s.out = sim(probit.out, x = psi.low, x1 = psi.high)
+summary(s.out)
+
+# You can also plot the results from the simulations in Zelig.
+plot(s.out)
+
+# Another example
+# First Difference when Shifting GPA from 2 to 3 with PSI=0 and TUCE at mean
+gpa.low = setx(probit.out, GPA=2, PSI=0)
+gpa.high = setx(probit.out, GPA = 3, PSI=0)
+s.out1 = sim(probit.out, x = gpa.low, x1 = gpa.high)
+summary(s.out1)
+plot(s.out1)
