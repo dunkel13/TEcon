@@ -105,3 +105,16 @@ logit.mfx.out$dcvar # indicates for which variable a discrete change marginal ef
 # Odds ratios
 logit.or.out=logitor(GRADE ~ GPA + TUCE + PSI, data = Spector)
 logit.or.out
+
+# Now, get the underlying latent index, z, from some of this stuff and show how to get the set of probabilities for each case the hard way. Note that these correspond to fitted.probs above.
+beta = probitglm.out$coefficients
+x = cbind(1,as.matrix(Spector[,1:3]))
+z = x%*% beta
+head(z)
+pz = pnorm(c(z))
+head(pz)
+
+# Generating the model predictions and a prediction success table.
+Predict = recode(fitted.probs, "0:0.499999=0; 0.5:1=1")
+Predict
+table(Predict,GRADE)
