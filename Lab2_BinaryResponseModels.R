@@ -118,3 +118,22 @@ head(pz)
 Predict = recode(fitted.probs, "0:0.499999=0; 0.5:1=1")
 Predict
 table(Predict,GRADE)
+
+# Calculate marginal effects with all variables at their means from the probit coefficients and a scale factor. These can be interpreted much like slopes. See table 21.1 on p. 675 of Greene.
+beta = probitglm.out$coefficients
+xbar = as.matrix(colMeans(cbind(1,Spector[1:3])))
+zxbar = t(xbar) %*% beta
+scalefactor = dnorm(zxbar)
+scalefactor
+margin = scalefactor* beta[2:4]
+margin
+
+# Calculate marginal effects with all variables at their means from the logit coefficients and a scale factor. Again, these can be interpreted much like slopes. Compare the results to those on p. 675 of Greene.
+beta1 =logitglm.out$coefficients
+xbar1 =as.matrix(colMeans(cbind(1,Spector[1:3])))
+zxbar1 = t(xbar1) %*% beta1
+lambda = 1/(1+exp(-zxbar1))
+scalefactor1 =lambda*(1-lambda)
+scalefactor1
+margin1 = scalefactor*beta[2:4]
+margin1
