@@ -51,3 +51,57 @@ anova(update(probitglm.out, GRADE ~ GPA + TUCE + PSI ), probitglm.out, test = 'F
 anova(update(probitglm.out, GRADE ~ GPA + TUCE + PSI + TUCE*PSI), probitglm.out, test = 'Chisq')
 anova(update(probitglm.out, GRADE ~ GPA + TUCE + PSI + TUCE*PSI), probitglm.out, test = 'F')
 
+#--------------------------------------- Logit estimation ------------------------------------------
+logitglm.out = glm( GRADE ~ GPA + TUCE + PSI, family = binomial, data = Spector)
+summary(logitglm.out)
+
+# Following are some interesting values that can be extracted from the model for later use.
+# The value of the loglikelihood at the maximum
+loglik = 1/2*probitglm.out$deviance
+loglik
+# Akaike's Information Criterion
+aic = probitglm.out$aic
+aic
+# Model Coefficients
+beta = probitglm.out$coefficients
+beta
+# Model Residuals
+residuals = probitglm.out$residuals
+residuals
+# Fitted Probabilities
+fitted.probs =probitglm.out$fitted.values
+fitted.probs
+# Covariance of the coefficients.
+covb = probitsummary$cov.unscaled
+covb
+# 95% CI for the coefficients
+confint(logitglm.out) 
+logitglm.out$coefficients
+# exponentiated coefficients (Odds ratios)
+exp(coef(logitglm.out)) 
+# 95% CI for exponentiated coefficients
+exp(confint(logitglm.out)) 
+# predicted values
+predict(logitglm.out, type="response") 
+
+# Marginal effects
+install.packages("sandwich")
+library(sandwich)
+install.packages("lmtest")
+library(lmtest)
+install.packages("zoo")
+library(zoo)
+install.packages("mfx")
+library(mfx)
+
+probit.mfx.out = probitmfx(GRADE ~ GPA + TUCE + PSI, data = Spector)
+probit.mfx.out
+logit.mfx.out = logitmfx(GRADE ~ GPA + TUCE + PSI, data = Spector)
+logit.mfx.out
+logit.mfx.out$mfxest
+logit.mfx.out$fit
+logit.mfx.out$dcvar # indicates for which variable a discrete change marginal effect is captured
+
+# Odds ratios
+logit.or.out=logitor(GRADE ~ GPA + TUCE + PSI, data = Spector)
+logit.or.out
