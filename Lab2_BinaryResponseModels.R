@@ -175,3 +175,14 @@ gpa.high = setx(probit.out, GPA = 3, PSI=0)
 s.out1 = sim(probit.out, x = gpa.low, x1 = gpa.high)
 summary(s.out1)
 plot(s.out1)
+
+# ROC plots can be used to gauge the relative fit of two models using prediction success. In R, the best model is the one that comes closest to the topright corner of the graph. A completely uninformative model would be one which falls along the diagonal reference line.
+# For example, consider the models below where PSI has been omitted from the second model.
+probit1.out = zelig(GRADE ~ GPA + TUCE + PSI, model="probit", data=Spector)
+probit2.out = zelig( GRADE ~ GPA + TUCE , model="probit", data=Spector)
+rocplot(probit1.out, probit2.out)
+
+# All that is needed to move to logit is changing the model = "probit" option to model = "logit". Just change the output object to logit.out for the other calculations. The only calculation that is different is for the marginal effects.
+# Let's run the logit and calculate the marginal effects, leaving the other calculations above for you to do on your own.
+logit.out = zelig( GRADE ~ GPA + TUCE + PSI, model = "logit", data = Spector)
+summary(logit.out)
