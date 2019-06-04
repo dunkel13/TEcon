@@ -186,3 +186,61 @@ rocplot(probit1.out, probit2.out)
 # Let's run the logit and calculate the marginal effects, leaving the other calculations above for you to do on your own.
 logit.out = zelig( GRADE ~ GPA + TUCE + PSI, model = "logit", data = Spector)
 summary(logit.out)
+
+######################## Example 2: let's estimate a Probit the hard way and obtain the interesting quantities.
+
+# First, create the data matrix, dependent vector, and other necessary quantities.
+x = cbind(1,GPA,TUCE,PSI)
+y = as.matrix(GRADE)
+z = as.matrix(PSI)
+K = ncol(x)
+K
+
+
+# Define Probit Log Likelihood
+llik.probit=function(par, X, Y){
+    Y = as.matrix(y)
+    X = as.matrix(x)
+    b = as.matrix(par[1:K])
+    phi = pnorm(X%*%b, mean=0, sd=1, lower.tail = TRUE, log.p = FALSE)
+    sum(Y*log(phi)+(1-Y)*log(1-phi))
+}
+
+#Fit Probit Model
+
+values.start = lm(GRADE ~ GPA + TUCE + PSI)$coef
+mod.probit = optim(values.start, llik.probit, Y=Y, X=X)
+mod.probit = optim(values.start, llik.probit, Y=Y, X=X, method=c("BFGS"), control=list(maxit=2000, fnscale=-1), hessian=T)
+mod.probit
+
+# Save the log likelihood for later use
+LR = mod.probit$value
+LR
+
+# Calculate the variance matrix from the Hessian matrix.
+v  = -solve(mod.probit$hessian)
+v
+# Calculate the standard errors from the variance matrix.
+se = sqrt(*diag(v))
+se
+
+# Calculate the z statistics from the coefficients and standard errors
+b = mod.probit$par
+b
+zstat = b/se
+zstat
+
+# Calculate p values from the z statistics
+pz = 2*(1-pnorm(abs(zstat)))
+pz
+
+# Put the results together in a table.
+table = cbind(b,se,zstat,pz)
+table
+
+# Obtain the underlying latent index, z.
+z = x%*% b
+z
+
+# Calculate the probabilities for each value of z
+pz = pnorm(c(z))
